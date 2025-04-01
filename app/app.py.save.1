@@ -1,0 +1,110 @@
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+import mysql.connector
+
+app = Flask(__name__)
+
+# Configuración de conexión a la base de datos en AWS RDS
+db_config = {
+    "host": "database-privada.cfmk6ioegnq6.us-east-1.rds.amazonaws.com",  # Cambia esto por el endpoint de tu instancia Aurora
+    "user": "admin",
+    "password": "HexVault4802",
+    "database": "sakila"
+}
+
+def get_db_connection():
+    """Función para obtener la conexión a la base de datos."""
+    return mysql.connector.connect(**db_config)
+
+
+
+# Página de inicio
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# Listado de películas
+@app.route('/movies')
+def movies():
+    return render_template('movies.html')
+
+# Detalles de una película específica
+@app.route('/movie/<int:movie_id>')
+def movie_details(movie_id):
+    return render_template('movie.html', movie_id=movie_id)
+
+# Búsqueda de películas
+@app.route('/search', methods=['GET'])
+def search():
+    query = request.args.get('query')
+    return render_template('search.html', query=query)
+
+# Autenticación
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/register')
+def register():
+    return render_template('register.html')
+
+@app.route('/logout')
+def logout():
+    return redirect(url_for('index'))
+
+# Gestión de compras
+@app.route('/cart')
+def cart():
+    return render_template('cart.html')
+
+@app.route('/cart/add/<int:movie_id>')
+def add_to_cart(movie_id):
+    return redirect(url_for('cart'))
+
+@app.route('/cart/remove/<int:movie_id>')
+def remove_from_cart(movie_id):
+    return redirect(url_for('cart'))
+
+@app.route('/checkout')
+def checkout():
+    return render_template('checkout.html')
+
+@app.route('/order/<int:order_id>')
+def order_details(order_id):
+    return render_template('order.html', order_id=order_id)
+
+# Rutas de administración
+@app.route('/admin/movies')
+def admin_movies():
+    return render_template('admin_movies.html')
+
+@app.route('/admin/movies/add')
+def add_movie():
+    return render_template('add_movie.html')
+
+@app.route('/admin/movies/edit/<int:movie_id>')
+def edit_movie(movie_id):
+    return render_template('edit_movie.html', movie_id=movie_id)
+
+@app.route('/admin/movies/delete/<int:movie_id>')
+def delete_movie(movie_id):
+    return redirect(url_for('admin_movies'))
+
+@app.route('/admin/orders')
+def admin_orders():
+    return render_template('admin_orders.html')
+
+# Otras rutas
+@app.route('/genres')
+def genres():
+    return render_template('genres.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)

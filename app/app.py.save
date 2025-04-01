@@ -1,0 +1,42 @@
+from flask import Flask, render_template, request, redirect, url_for
+
+app = Flask(__name__)
+
+# Página de inicio
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# Listado de películas
+@app.route('/movies')
+def movies():
+    return render_template('movies.html')
+
+# Detalles de una película específica
+@app.route('/movie/<int:movie_id>')
+def movie_details(movie_id):
+    return render_template('movie.html', movie_id=movie_id)
+
+# Gestión de compras
+@app.route('/cart')
+def cart():
+    return render_template('cart.html')
+
+# Otras rutas
+@app.route('/genres')
+def genres():
+    return render_template('genres.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
+
+
+
+
+
+
+

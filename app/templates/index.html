@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, #557eeb, #48acef, #87c9f6);
+            color: white;
+            text-align: center;
+        }
+        nav {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 20px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        header {
+            margin-top: 80px;
+            padding: 20px;
+        }
+        form {
+            margin-top: 20px;
+        }
+        input, select, button {
+            padding: 10px;
+            font-size: 1em;
+            margin: 5px;
+            border-radius: 30px;
+            border: none;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            color: white;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="genres.html">🎭 Genres</a></li>
+            <li><a href="movies.html">🎬 Movies</a></li>
+            <li><a href="about.html">📖 About</a></li>
+            <li><a href="cart.html">🛒 Cart</a></li>
+        </ul>
+    </nav>
+    
+    <header>
+        <h1>Welcome to Movie App</h1>
+    </header>
+    
+    <section id="search">
+        <h2>Search for Movies</h2>
+        <form id="searchForm">
+            <input type="text" name="query" id="query" placeholder="Search for movies...">
+            <select name="filter" id="filter">
+                <option value="title">By Title</option>
+                <option value="actor">By Actor</option>
+            </select>
+            <button type="submit">Search</button>
+        </form>
+        <div class="results" id="results"></div>
+    </section>
+    
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const query = document.getElementById('query').value;
+            const filter = document.getElementById('filter').value;
+            const resultsDiv = document.getElementById('results');
+            
+            if (!query) {
+                resultsDiv.innerHTML = '<p>Please enter a search term.</p>';
+                resultsDiv.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/search?query=${query}&filter=${filter}`);
+                const data = await response.json();
+                resultsDiv.style.display = 'block';
+                if (data.length > 0) {
+                    resultsDiv.innerHTML = '<h3>Search Results:</h3>' + data.map(movie => 
+                        `<p><strong>${movie.title}</strong>: ${movie.description}</p>`
+                    ).join('');
+                } else {
+                    resultsDiv.innerHTML = '<p>No results found.</p>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<p>Error fetching data.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
+

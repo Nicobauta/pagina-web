@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 100px;
+            padding: 0;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #ffdde1);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+            color: white;
+            text-align: center;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        nav {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 20px;
+        }
+        nav ul li {
+            display: inline;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2em;
+            transition: 0.3s;
+        }
+        .movies-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .movie-card {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+        }
+        .movie-card:hover{
+            transform: scale(1.03);
+        }
+        .movie-card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .movie-card button {
+            background: #ff7eb3;
+            display: inline-block;
+            padding: 12px 25px;
+            font-size: 1rem;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .movie-card button:hover {
+            background-color: #ff758c;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="genres.html">🎭 Genres</a></li>
+            <li><a href="movies.html">🎬 Movies</a></li>
+            <li><a href="about.html">📖 About</a></li>
+            <li><a href="cart.html">🛒 Cart</a></li>
+        </ul>
+    </nav>
+    
+    <header>
+        <h1>Movies Collection</h1>
+    </header>
+    
+    <section class="movies-container">
+        <div class="movie-card">
+            <img src="https://via.placeholder.com/200x300" alt="Movie Poster">
+            <h3>Movie Title 1</h3>
+            <button onclick="location.href='movie.html'">View Details</button>
+        </div>
+        <div class="movie-card">
+            <img src="https://via.placeholder.com/200x300" alt="Movie Poster">
+            <h3>Movie Title 2</h3>
+            <button onclick="location.href='movie.html'">View Details</button>
+        </div>
+        <div class="movie-card">
+            <img src="https://via.placeholder.com/200x300" alt="Movie Poster">
+            <h3>Movie Title 3</h3>
+            <button onclick="location.href='movie.html'">View Details</button>
+        </div>
+    </section>
+</body>
+</html>

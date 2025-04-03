@@ -183,3 +183,52 @@ git config --global user.email "nicobaujoya@gmail.com"
 git init
 git add .
 exit
+git init
+git add .
+git commit -m "subiendo"
+git branch -M main
+git remote add origin https://github.com/Nicobauta/pagina-web.git
+git push -u origin main
+ls
+source flask/bin/activate
+cd app/
+ls
+python3 app.py
+source flask/bin/activate
+cd app/
+python3 app.py
+lsof -i :5000
+kill 1260
+kill 1343
+lsof -i :5000
+python3 app.py
+source flask/bin/activate
+ls
+cd app
+ls
+sudo nano app.py
+source flask/bin/activate
+cd app/
+python3 app.py
+lsof -i :5000
+kill 1469
+lsof -i :5000
+python3 app.py
+source flask/bin/activate
+cd app
+ls
+sudo nano app.py
+ls
+cd templates/
+ls
+nano cart.html 
+source flask/bin/activate
+cd app
+ls
+python3 app.py
+sudo nano app.py
+cd templates/
+ls
+nano cart.html 
+cd ..
+python3 app.py

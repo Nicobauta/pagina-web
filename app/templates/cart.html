@@ -95,8 +95,10 @@
         
         <div class="cart" id="renta-section">
             <label for="clientes">Seleccionar Cliente:</label>
+            <input type="text" id="buscar-clientes" placeholder="Buscar Cliente..." oninput="filtrarClientes()">
             <select id="clientes" onchange="actualizarPeliculas()"></select>
             <label for="peliculas">Seleccionar Película:</label>
+            <input type="text" id="buscar-peliculas" placeholder="Buscar Película..." oninput="filtrarPeliculas()">
             <select id="peliculas"></select>
             <p id="disponibilidad"></p>
             <button class="btn" onclick="agregarAlCarrito()">Agregar al Carrito</button>
@@ -115,26 +117,35 @@
 
     <script>
         let baseDatos = {
-            clientes: ["Juan Pérez", "María García", "Carlos López"],
-            peliculas: [
-                { titulo: "Inception", disponibles: 3, rentadas: {} },
-                { titulo: "Interstellar", disponibles: 2, rentadas: {} },
-                { titulo: "Titanic", disponibles: 1, rentadas: {} }
-            ],
+            clientes: [],
+            peliculas: [],
             carrito: []
         };
 
         function cargarDatos() {
-            let clientesSelect = document.getElementById("clientes");
-            let clientesDevolucion = document.getElementById("clientes-devolucion");
-            
-            baseDatos.clientes.forEach(cliente => {
-                let option = document.createElement("option");
-                option.textContent = cliente;
-                clientesSelect.appendChild(option);
-                clientesDevolucion.appendChild(option.cloneNode(true));
-            });
-            actualizarPeliculas();
+            // Cargar clientes desde Flask
+            fetch('/clientes')
+                .then(response => response.json())
+                .then(data => {
+                    baseDatos.clientes = data;
+                    let clientesSelect = document.getElementById("clientes");
+                    data.forEach(cliente => {
+                        let option = document.createElement("option");
+                        option.value = cliente.customer_id;
+                        option.textContent = cliente.name;
+                        clientesSelect.appendChild(option);
+                    });
+                    // Llamar a la función para cargar películas
+                    actualizarPeliculas();
+                });
+
+            // Cargar películas desde Flask
+            fetch('/peliculas')
+                .then(response => response.json())
+                .then(data => {
+                    baseDatos.peliculas = data;
+                    actualizarPeliculas();
+                });
         }
 
         function actualizarPeliculas() {
@@ -142,8 +153,8 @@
             peliculasSelect.innerHTML = "";
             baseDatos.peliculas.forEach((pelicula, index) => {
                 let option = document.createElement("option");
-                option.value = index;
-                option.textContent = `${pelicula.titulo} (${pelicula.disponibles} disponibles)`;
+                option.value = pelicula.film_id;
+                option.textContent = `${pelicula.title} (${pelicula.inventory_in_stock} disponibles)`;
                 peliculasSelect.appendChild(option);
             });
         }
@@ -151,12 +162,9 @@
         function agregarAlCarrito() {
             let index = document.getElementById("peliculas").value;
             let cliente = document.getElementById("clientes").value;
-            let pelicula = baseDatos.peliculas[index];
+            let pelicula = baseDatos.peliculas.find(p => p.film_id == index);
             
-            if (pelicula.disponibles > 0) {
-                if (!pelicula.rentadas[cliente]) pelicula.rentadas[cliente] = 0;
-                pelicula.rentadas[cliente]++;
-                pelicula.disponibles--;
+            if (pelicula.inventory_in_stock > 0) {
                 baseDatos.carrito.push(pelicula);
                 actualizarCarrito();
             } else {
@@ -168,56 +176,45 @@
             let carritoLista = document.getElementById("carrito-lista");
             carritoLista.innerHTML = "<h3>Carrito:</h3>";
             baseDatos.carrito.forEach(item => {
-                carritoLista.innerHTML += `<p>${item.titulo}</p>`;
+                carritoLista.innerHTML += `<p>${item.title}</p>`;
             });
         }
 
         function procesarRenta() {
-            alert("Tu renta ha sido procesada.");
-            baseDatos.carrito = [];
-            actualizarCarrito();
-            actualizarPeliculas();
+            let cliente = document.getElementById("clientes").value;
+            let pelicula = baseDatos.carrito[0];
+            
+            fetch('/rentar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ customer_id: cliente, film_id: pelicula.film_id })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message));
         }
 
-        function actualizarPeliculasRentadas() {
-            let cliente = document.getElementById("clientes-devolucion").value;
-            let peliculasRentadasSelect = document.getElementById("peliculas-rentadas");
-            peliculasRentadasSelect.innerHTML = "";
-            baseDatos.peliculas.forEach((pelicula, index) => {
-                if (pelicula.rentadas[cliente] > 0) {
-                    let option = document.createElement("option");
-                    option.value = index;
-                    option.textContent = `${pelicula.titulo} (${pelicula.rentadas[cliente]} rentadas)`;
-                    peliculasRentadasSelect.appendChild(option);
-                }
+        function filtrarClientes() {
+            let input = document.getElementById("buscar-clientes").value.toLowerCase();
+            let clientesSelect = document.getElementById("clientes");
+            let opciones = clientesSelect.getElementsByTagName("option");
+            Array.from(opciones).forEach(option => {
+                let texto = option.textContent.toLowerCase();
+                option.style.display = texto.includes(input) ? "block" : "none";
             });
         }
 
-        function devolverPelicula() {
-            let cliente = document.getElementById("clientes-devolucion").value;
-            let index = document.getElementById("peliculas-rentadas").value;
-            let pelicula = baseDatos.peliculas[index];
-            
-            if (pelicula.rentadas[cliente] > 0) {
-                pelicula.rentadas[cliente]--;
-                pelicula.disponibles++;
-                actualizarPeliculasRentadas();
-                actualizarPeliculas();
-                alert("Película devuelta.");
-            }
-        }
-
-        function mostrarRenta() {
-            document.getElementById("renta-section").classList.remove("hidden");
-            document.getElementById("devolucion-section").classList.add("hidden");
-        }
-
-        function mostrarDevolucion() {
-            document.getElementById("devolucion-section").classList.remove("hidden");
-            document.getElementById("renta-section").classList.add("hidden");
+        function filtrarPeliculas() {
+            let input = document.getElementById("buscar-peliculas").value.toLowerCase();
+            let peliculasSelect = document.getElementById("peliculas");
+            let opciones = peliculasSelect.getElementsByTagName("option");
+            Array.from(opciones).forEach(option => {
+                let texto = option.textContent.toLowerCase();
+                option.style.display = texto.includes(input) ? "block" : "none";
+            });
         }
 
         window.onload = cargarDatos;
     </script>
 </body>
 </html>
+

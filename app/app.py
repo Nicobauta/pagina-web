@@ -66,6 +66,63 @@ def search():
     connection.close()
     return jsonify(results)
 
+@app.route('/clientes', methods=['GET'])
+def get_clientes():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT customer_id, CONCAT(first_name, ' ', last_name) AS name FROM customer")
+    clientes = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return jsonify(clientes)
+
+@app.route('/peliculas', methods=['GET'])
+def get_peliculas():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("""
+    SELECT f.film_id, f.title, f.rental_rate, COUNT(i.inventory_id) AS stock
+    FROM film f
+    LEFT JOIN inventory i ON f.film_id = i.film_id
+    GROUP BY f.film_id, f.title, f.rental_rate;
+    """)
+    peliculas = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return jsonify(peliculas)
+
+@app.route('/rentar', methods=['POST'])
+def rentar_pelicula():
+    data = request.json
+    customer_id = data.get('customer_id')
+    film_id = data.get('film_id')
+    if not customer_id or not film_id:
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    # Verificar disponibilidad
+    cursor.execute("SELECT inventory_in_stock FROM film WHERE film_id = %s", (film_id,))
+    stock = cursor.fetchone()[0]
+
+    if stock > 0:
+        # Reducir stock
+        cursor.execute("UPDATE film SET inventory_in_stock = inventory_in_stock - 1 WHERE film_id = %s", (film_id,))
+        connection.commit()
+        message = "Película rentada exitosamente"
+    else:
+        message = "No hay copias disponibles"
+
+    cursor.close()
+    connection.close()
+    return jsonify({"message": message})
+
+
+
+
+
+
 # Autenticación
 @app.route('/login')
 def login():

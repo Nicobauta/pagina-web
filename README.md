@@ -47,7 +47,7 @@ MySQL en AWS RDS
 ---
 
 ## Estructura del proyecto
-
+```
 .
 ├── .cache/
 ├── .ssh/
@@ -80,7 +80,7 @@ MySQL en AWS RDS
 ├── .gitconfig
 ├── .profile
 └── .sudo_as_admin_successful
-
+```
 ---
 
 ### Rutas principales

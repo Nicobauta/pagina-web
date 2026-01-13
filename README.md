@@ -81,6 +81,7 @@ MySQL en AWS RDS
 ├── .profile
 └── .sudo_as_admin_successful
 
+---
 
 ### Rutas principales
 
